@@ -1,0 +1,153 @@
+Sub EQUIVALENT_RECTANGULAR_DIMENSIONS()
+'    Dim i As Integer
+'    Dim j As Integer
+'    Application.ScreenUpdating = False
+'    Application.Calculation = xlCalculationManual
+'    Application.EnableEvents = False
+'
+'    Set mark = Sheets("Ductilator").Range(ActiveCell.Address)   'set current cell
+'
+'
+'        'find and set data range
+'        Cells.Find(What:="CFM", After:=ActiveCell, LookIn:=xlFormulas, _
+'            LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+'            MatchCase:=False, SearchFormat:=False).Activate
+'        If Sheets("Ductilator").Range("SIZING").Value = "Off" Then
+'            ActiveCell.Offset(1, 0).Activate
+'            j = 6
+'        Else
+'            ActiveCell.Offset(1, 7).Activate
+'            j = -1
+'        End If
+'
+'        FirstRow = ActiveCell.Row
+'        LastRow = [A65536].End(xlUp).Row
+'
+'    'calculate rectangular equivalent using goalseek
+'    For i = FirstRow To LastRow
+'        If IsNumeric(Cells(i, 6).Value) Then
+'            If Cells(i, 6).Value > 0 Then
+'                Cells(i, 6).GoalSeek Goal:=Cells(i, 4).Value, ChangingCell:=Range("H" & i)
+'            End If
+'        End If
+'    Next i
+'
+'    Application.ScreenUpdating = True
+'    Application.Calculation = xlCalculationAutomatic
+'    Application.EnableEvents = True
+'
+'    mark.Select 'return to current cell
+End Sub
+
+Sub SET_DUCT_VELOCITY()
+    Dim Velocity As Integer
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
+    Dim CSheet As Variant: CSheet = "A.Ductilator"
+    
+    Set mark = Sheets(CSheet).Range(ActiveCell.Address)   'set current cell
+    
+    'find and set data range
+    Cells.Find(What:="Design For", After:=ActiveCell, LookIn:=xlFormulas, _
+        LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+    ActiveCell.Offset(1, 0).Activate
+    
+    If Sheets(CSheet).Range("DESIGN_FOR").Value = "Branch" Then Sheets(CSheet).Range("VELOCITY").Value = 450
+    If Sheets(CSheet).Range("DESIGN_FOR").Value = "Main" Then Sheets(CSheet).Range("VELOCITY").Value = 650
+    If Sheets(CSheet).Range("DESIGN_FOR").Value = "Kitchen Hood" Then Sheets(CSheet).Range("VELOCITY").Value = 1000
+    If Sheets(CSheet).Range("DESIGN_FOR").Value = "Dryer" Then Sheets(CSheet).Range("VELOCITY").Value = 2300
+    
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = True
+    
+    mark.Select 'return to current cell
+    
+    EQUIVALENT_RECTANGULAR_DIMENSIONS
+    
+End Sub
+
+Sub RESTORE_DEFAULTS()
+    Dim i As Integer
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
+    Dim CSheet As Variant: CSheet = "A.Ductilator"
+    
+    Set mark = Sheets(CSheet).Range(ActiveCell.Address)   'set current cell
+    
+    'find and set data range
+    Cells.Find(What:="Actual Ø [in]", After:=ActiveCell, LookIn:=xlFormulas, _
+        LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+    ActiveCell.Offset(1, 0).Activate
+    FirstRow = ActiveCell.Row
+    LastRow = [A65536].End(xlUp).Row
+
+    If Sheets(CSheet).Range("RESTORE").Value = "Defaults" Then
+        Sheets(CSheet).Range("BASIS").Value = "Velocity"
+        Sheets(CSheet).Range("FRICTION").Value = "0.1"
+        Sheets(CSheet).Range("VELOCITY").Value = "650"
+        Sheets(CSheet).Range("DUCT_TYPE").Value = "Rectangular"
+        Sheets(CSheet).Range("DESIGN_FOR").Value = "Main"
+        'restore all calculated values in column
+        For i = FirstRow To LastRow
+            Cells(i, 5).Value = "=D" & i
+            Cells(i, 10).Value = "100%"
+        Next i
+    End If
+    
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = True
+    
+    mark.Select 'return to current cell
+End Sub
+
+Sub FORMAT_TEXT()
+    Dim bgColor As Variant
+    Dim fnColor As Variant
+    Dim CSheet As Variant: CSheet = "BETA - Static Pressure"
+    
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
+    
+    Set mark = Sheets(CSheet).Range(ActiveCell.Address)   'set current cell
+    
+    'find and set data range
+    Cells.Find(What:="Duct Element", After:=ActiveCell, LookIn:=xlFormulas, _
+        LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+    ActiveCell.Offset(1, 0).Activate
+    FirstRow = ActiveCell.Row
+    LastRow = [A65536].End(xlUp).Row
+
+    ' If ActiveCell.Value = "Transition" Then
+    '    Sheets("Static Pressure").Range("K12", "M13").Interior.Color = Black
+    '    Sheets("Static Pressure").Range("K12", "M13").Font.Color = Black
+    ' End If
+        
+    If ActiveCell.Value = "Transition" Then
+        Sheets(CSheet).Range("K12", "M13").Select
+        With Sheets(CSheet).Range("K12:M13")
+            With .FormatConditions(.FormatConditions.Count)
+                .SetFirstPriority
+                With .Interior
+                    .PatternColorIndex = xlAutomatic
+                    .Color = 5287936
+                    .TintAndShade = 0
+                End With
+            End With
+        End With
+    End If
+    
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = True
+    
+    mark.Select 'return to current cell
+    
+End Sub
