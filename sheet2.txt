@@ -1,0 +1,13 @@
+Private Sub Worksheet_Change(ByVal Target As Range)
+    EQUIVALENT_RECTANGULAR_DIMENSIONS
+    SET_DUCT_VELOCITY
+    RESTORE_DEFAULTS
+End Sub
+
+Function IsFormula(ByVal Ref As Range) As Variant
+    If Ref.Cells.Count > 1 Then
+        IsFormula = CVErr(xlErrNA)
+    Else
+        IsFormula = Ref.HasFormula
+    End If
+End Function
